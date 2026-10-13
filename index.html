@@ -159,7 +159,7 @@
             color: var(--text-main);
         }
 
-        button {
+        #readBtn {
             background: var(--accent);
             color: var(--btn-text);
             border: none;
@@ -176,10 +176,62 @@
             text-transform: uppercase;
         }
 
-        button:active {
+        #readBtn:active {
             transform: translateY(2px);
             box-shadow: 0 2px 0px var(--shadow-color) !important;
             filter: brightness(1.1);
+        }
+
+        /* ===== LANGUAGE SWITCH ===== */
+
+        .lang-switch {
+            position: fixed;
+            top: 0.5rem;
+            right: 0.5rem;
+            z-index: 5;
+            display: flex;
+        }
+
+        .lang-btn {
+            padding: 6px;              /* bigger tap target than the flag */
+            border: none;
+            background: none;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: opacity 0.15s;
+        }
+
+        .lang-btn:hover {
+            opacity: 0.8;
+        }
+
+        .lang-btn[aria-pressed="true"] {
+            opacity: 1;
+        }
+
+        .flag {
+            display: block;
+            width: 30px;
+            height: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px var(--border-color);
+        }
+
+        .flag svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .lang-btn[aria-pressed="true"] .flag,
+        .lang-btn:focus-visible .flag {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .lang-btn:focus-visible {
+            outline: none;
         }
 
         /* ===== INFO ICONS + POPUP ===== */
@@ -270,21 +322,25 @@
     </style>
 </head>
 <body>
+    <!-- flag buttons are generated from LANGS in data.js -->
+    <nav id="langSwitch" class="lang-switch" data-i18n-aria="ariaLang" aria-label="Language"></nav>
+
     <div class="display-area">
-        <div id="meta"><span id="metaText"></span><span class="info" data-info="date" role="button" tabindex="0" aria-label="About the date">?</span></div>
+        <div id="meta"><span id="metaText"></span><span class="info" data-info="date" role="button" tabindex="0" data-i18n-aria="ariaDate" aria-label="About the date">?</span></div>
         <div id="prophecy">The stars are waiting.</div>
         <div id="readout"><div id="readoutText"></div></div>
     </div>
 
     <div class="controls">
         <div class="input-group">
-            <label for="nameInput">Your Name<span class="info" data-info="name" role="button" tabindex="0" aria-label="Why we need your name">?</span></label>
-            <input id="nameInput" type="text" maxlength="40" autocomplete="off" placeholder="Name">
+            <label for="nameInput"><span data-i18n="nameLabel">Your Name</span><span class="info" data-info="name" role="button" tabindex="0" data-i18n-aria="ariaName" aria-label="Why we need your name">?</span></label>
+            <input id="nameInput" type="text" maxlength="40" autocomplete="off" placeholder="Name" data-i18n-placeholder="namePlaceholder">
         </div>
 
         <div class="input-group">
-            <label for="signSelect">Your Sign<span class="info" data-info="sign" role="button" tabindex="0" aria-label="Why we need your sign">?</span></label>
-            <!-- &#9800; etc. are HTML entities, so the source stays ASCII -->
+            <label for="signSelect"><span data-i18n="signLabel">Your Sign</span><span class="info" data-info="sign" role="button" tabindex="0" data-i18n-aria="ariaSign" aria-label="Why we need your sign">?</span></label>
+            <!-- &#9800; etc. are HTML entities, so the source stays ASCII.
+                 Values stay English in every language: they are part of the seed. -->
             <select id="signSelect">
                 <option value="Aries">&#9800; Aries</option>
                 <option value="Taurus">&#9801; Taurus</option>
@@ -301,16 +357,16 @@
             </select>
         </div>
 
-        <button id="readBtn">CONSULT!</button>
+        <button id="readBtn" data-i18n="consult">CONSULT!</button>
 
-        <div class="fineprint">Methodology<span class="info" data-info="method" role="button" tabindex="0" aria-label="Methodology">?</span></div>
+        <div class="fineprint"><span data-i18n="methodology">Methodology</span><span class="info" data-info="method" role="button" tabindex="0" data-i18n-aria="ariaMethod" aria-label="Methodology">?</span></div>
     </div>
 
     <div id="popup" role="tooltip"></div>
 
     <script src="data.js"></script>
     <script>
-        // WEEKDAYS, MONTHS and VERBS come from data.js
+        // WEEKDAY_WEIGHTS and LANGS come from data.js
 
         // ===== SEEDED RNG =====
 
@@ -350,17 +406,65 @@
             return list[Math.floor(rng() * list.length)];
         }
 
-        function pickWeighted(rng, pairs) {
-            const total = pairs.reduce((sum, p) => sum + p[1], 0);
-            let r = rng() * total;
-            for (const [value, weight] of pairs) {
-                if (r < weight) return value;
-                r -= weight;
-            }
-            return pairs[pairs.length - 1][0];
+        function pickIndex(rng, length) {
+            return Math.floor(rng() * length);
         }
 
+        function pickWeightedIndex(rng, weights) {
+            const total = weights.reduce((sum, w) => sum + w, 0);
+            let r = rng() * total;
+            for (let i = 0; i < weights.length; i++) {
+                if (r < weights[i]) return i;
+                r -= weights[i];
+            }
+            return weights.length - 1;
+        }
+
+        // ===== TEXT HELPERS =====
+
+        // fill('{time}, you will...', { time: 'next Friday' })
+        function fill(template, parts) {
+            return template.replace(/\{(\w+)\}/g, (m, key) => (key in parts ? String(parts[key]) : m));
+        }
+
+        function capitalize(s) {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        // ===== LANGUAGES =====
+
+        const LANG_CODES = Object.keys(LANGS);
+        const REF = LANGS[LANG_CODES[0]];   // picks use the reference shape
+        const LANG_KEY = 'pocket-oracle-lang';
+
+        // every language must mirror the reference shape (see data.js)
+        function shapeOf(T) {
+            return [T.weekdays.length, T.months.length, T.years.length, T.signs.length,
+                ...T.verbs.map((v) => v[1].length)].join(',');
+        }
+        for (const code of LANG_CODES) {
+            if (shapeOf(LANGS[code]) !== shapeOf(REF)) {
+                console.warn(`data.js: language "${code}" does not match the shape of "${LANG_CODES[0]}"`);
+            }
+        }
+
+        function loadLang() {
+            let saved = null;
+            try { saved = localStorage.getItem(LANG_KEY); } catch (e) { /* storage blocked */ }
+            if (saved && LANGS[saved]) return saved;
+            const browser = (navigator.language || '').slice(0, 2).toLowerCase();
+            return LANGS[browser] ? browser : LANG_CODES[0];
+        }
+
+        function saveLang(code) {
+            try { localStorage.setItem(LANG_KEY, code); } catch (e) { /* storage blocked */ }
+        }
+
+        let lang = loadLang();
+
         // ===== GENERATOR =====
+        // generate() returns positions and numbers only; describe() turns
+        // them into text for one language. Same reading, any language.
 
         function todayIso() {
             // local date, ISO 8601 (YYYY-MM-DD)
@@ -369,12 +473,12 @@
             return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
         }
 
+        // kind matches the list name in data.js
         function pickTime(rng) {
             const roll = rng();
-            if (roll < 0.80) return 'next ' + pickWeighted(rng, WEEKDAYS);
-            if (roll < 0.95) return 'next ' + pick(rng, MONTHS);
-            const years = 1 + Math.floor(rng() * 3);
-            return years === 1 ? 'in a year' : `in ${years} years`;
+            if (roll < 0.80) return { kind: 'weekdays', index: pickWeightedIndex(rng, WEEKDAY_WEIGHTS) };
+            if (roll < 0.95) return { kind: 'months', index: pickIndex(rng, REF.months.length) };
+            return { kind: 'years', index: pickIndex(rng, REF.years.length) };
         }
 
         function generate(name, sign, date) {
@@ -382,27 +486,17 @@
             const rng = sfc32(...cyrb128(key));
 
             const time = pickTime(rng);
-            const verb = pick(rng, Object.keys(VERBS));
-            const obj = pick(rng, VERBS[verb]);
-
-            const sentence = `${time}, you will ${verb} ${obj}.`;
+            const verb = pickIndex(rng, REF.verbs.length);
+            const obj = pickIndex(rng, REF.verbs[verb][1].length);
 
             // readout uses the same rng AFTER the prophecy picks,
             // so existing prophecies stay unchanged
-            return {
-                text: sentence.charAt(0).toUpperCase() + sentence.slice(1),
-                readout: makeReadout(rng, time)
-            };
+            return { time, verb, obj, readout: makeReadout(rng) };
         }
 
-        function makeReadout(rng, time) {
+        function makeReadout(rng) {
             const fidelity = (90 + rng() * 9.9).toFixed(1);
             const entanglement = (0.5 + rng() * 0.49).toFixed(2);
-
-            // uncertainty unit scales with how far the prophecy reaches
-            let unit = 'days';
-            if (/^in /.test(time)) unit = 'months';
-            else if (MONTHS.some((m) => time.endsWith(m))) unit = 'weeks';
             const margin = 1 + Math.floor(rng() * 3);
 
             // random 3D direction, normalised to unit length
@@ -410,12 +504,31 @@
             const len = Math.hypot(...v) || 1;
             v = v.map((x) => (x / len).toFixed(2));
 
-            return [
-                `Collapse fidelity: ${fidelity}%`,
-                `Entanglement index: ${entanglement}`,
-                `Heisenberg margin: +/- ${margin} ${margin === 1 ? unit.slice(0, -1) : unit}`,
-                `Destiny eigenvector: (${v.join(', ')})`
-            ];
+            return { fidelity, entanglement, margin, vector: v };
+        }
+
+        function describe(reading, T) {
+            const [verbText, objects] = T.verbs[reading.verb];
+            const text = capitalize(fill(T.sentence, {
+                time: T[reading.time.kind][reading.time.index],
+                verb: verbText,
+                obj: objects[reading.obj]
+            }));
+
+            // uncertainty unit scales with how far the prophecy reaches
+            const unit = { weekdays: 'days', months: 'weeks', years: 'months' }[reading.time.kind];
+            const r = reading.readout;
+            const num = (s) => s.replace('.', T.decimal);
+
+            return {
+                text,
+                readout: [
+                    fill(T.readout.fidelity, { value: num(r.fidelity) }),
+                    fill(T.readout.entanglement, { value: num(r.entanglement) }),
+                    fill(T.readout.margin, { value: r.margin, unit: T.units[unit][r.margin === 1 ? 0 : 1] }),
+                    fill(T.readout.vector, { value: r.vector.map(num).join(T.listSep) })
+                ]
+            };
         }
 
         // ===== UI =====
@@ -428,6 +541,29 @@
         const metaText = document.getElementById('metaText');
         const readout = document.getElementById('readout');
         const readoutText = document.getElementById('readoutText');
+        const langSwitch = document.getElementById('langSwitch');
+
+        const SIGN_KEYS = Array.from(signSelect.options, (o) => o.value);
+
+        let current = null;       // { name, sign, date, reading } of the last consult
+        let scrambling = false;
+
+        function showReading() {
+            const T = LANGS[lang];
+            const { name, sign, date, reading } = current;
+            const out = describe(reading, T);
+
+            prophecy.innerText = out.text;
+            prophecy.classList.add('active');
+            readoutText.replaceChildren(...out.readout.map((line) => {
+                const s = document.createElement('span');
+                s.textContent = line;
+                return s;
+            }));
+            readout.classList.add('visible');
+            metaText.textContent = `${name} / ${T.signs[SIGN_KEYS.indexOf(sign)]} / ${date}`;
+            meta.classList.add('visible');
+        }
 
         function consult() {
             const name = nameInput.value.trim();
@@ -441,7 +577,7 @@
 
             const sign = signSelect.value;
             const date = todayIso();
-            const result = generate(name, sign, date);
+            current = { name, sign, date, reading: generate(name, sign, date) };
 
             prophecy.classList.remove('active', 'shake');
             meta.classList.remove('visible');
@@ -451,27 +587,66 @@
 
             // short "scramble" with throwaway lines, like the dice roll
             const junk = sfc32(...cyrb128(String(Date.now())));
-            const verbs = Object.keys(VERBS);
             let counter = 0;
+            scrambling = true;
             const interval = setInterval(() => {
-                const v = pick(junk, verbs);
-                prophecy.innerText = `You will ${v} ${pick(junk, VERBS[v])}...`;
+                const T = LANGS[lang];
+                const [verb, objects] = pick(junk, T.verbs);
+                prophecy.innerText = capitalize(fill(T.teaser, { verb, obj: pick(junk, objects) }));
                 counter++;
                 if (counter > 6) {
                     clearInterval(interval);
-                    prophecy.innerText = result.text;
-                    prophecy.classList.add('active');
-                    readoutText.replaceChildren(...result.readout.map((line) => {
-                        const s = document.createElement('span');
-                        s.textContent = line;
-                        return s;
-                    }));
-                    readout.classList.add('visible');
-                    metaText.textContent = `${name} / ${sign} / ${date}`;
-                    meta.classList.add('visible');
+                    scrambling = false;
+                    showReading();
                     if (window.navigator.vibrate) window.navigator.vibrate(50);
                 }
             }, 40);
+        }
+
+        // ===== LANGUAGE SWITCH =====
+
+        function applyLang() {
+            const T = LANGS[lang];
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('[data-i18n]').forEach((el) => {
+                el.textContent = T.ui[el.dataset.i18n];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+                el.placeholder = T.ui[el.dataset.i18nPlaceholder];
+            });
+            document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+                el.setAttribute('aria-label', T.ui[el.dataset.i18nAria]);
+            });
+
+            // 9800 = U+2648 (Aries symbol); values stay untouched
+            Array.from(signSelect.options).forEach((o, i) => {
+                o.textContent = String.fromCodePoint(9800 + i) + ' ' + T.signs[i];
+            });
+
+            langSwitch.querySelectorAll('.lang-btn').forEach((b) => {
+                b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
+            });
+
+            if (!current) prophecy.textContent = T.ui.waiting;
+            else if (!scrambling) showReading();
+        }
+
+        for (const code of LANG_CODES) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'lang-btn';
+            b.dataset.lang = code;
+            b.lang = code;
+            b.title = LANGS[code].name;
+            b.setAttribute('aria-label', LANGS[code].name);
+            b.innerHTML = `<span class="flag">${LANGS[code].flag}</span>`;   // SVG from data.js
+            b.addEventListener('click', () => {
+                lang = code;
+                saveLang(code);
+                applyLang();
+            });
+            langSwitch.appendChild(b);
         }
 
         // ===== INFO POPUPS =====
@@ -483,7 +658,7 @@
         let pinned = null;
 
         function showPopup(icon) {
-            const entry = INFO[icon.dataset.info];
+            const entry = LANGS[lang].info[icon.dataset.info];
             if (!entry) return;
 
             popup.replaceChildren();
@@ -547,6 +722,8 @@
         nameInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') consult();
         });
+
+        applyLang();
     </script>
 </body>
 </html>
