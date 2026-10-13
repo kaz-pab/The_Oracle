@@ -294,7 +294,7 @@ const LANGS = {
             sign: {
                 title: 'The Boundary Condition',
                 paragraphs: [
-                    "At the moment of birth, the neutrino streams from celestial bodies imprint an initial state on the infant's quantum foam.",
+                    "At the moment of birth, the neutrino streams from celestial bodies imprint an initial state on the infant's consciousness matrix.",
                     "We cannot measure it directly (the hospital would not let us), so we approximate it with a zodiac sign, accurate to within roughly one twelfth of the sun-positions and adjusted for precession/rotation."
                 ]
             },
