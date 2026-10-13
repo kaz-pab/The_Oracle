@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pocket Oracle</title>
+    <style>
+        /* Colour tokens (Classic theme from Pocket Dice) */
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #666666;
+            --accent: #3b82f6;
+            --accent-active: #2563eb;
+            --combo-color: #22c55e;
+            --history-bg: #252525;
+            --border-color: #333;
+            --btn-text: #ffffff;
+            --shadow-color: #1d4ed8;
+            --input-bg: #252525;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        .display-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        #meta {
+            font-size: 0.9rem;
+            color: var(--combo-color);
+            font-weight: bold;
+            min-height: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.2rem;
+        }
+
+        #meta.visible {
+            opacity: 1;
+        }
+
+        #prophecy {
+            font-size: clamp(1.4rem, 6vw, 2.4rem);
+            font-weight: 900;
+            color: var(--text-muted);
+            line-height: 1.25;
+            user-select: none;
+            transition: color 0.1s ease-out, text-shadow 0.1s ease-out;
+        }
+
+        #prophecy.active {
+            color: var(--text-main);
+            text-shadow: 0 0 25px var(--accent);
+        }
+
+        #readout {
+            margin-top: 1.5rem;
+            font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        #readout.visible {
+            opacity: 0.85;
+        }
+
+        #readoutText {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.2rem 1rem;
+        }
+
+        .controls {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            padding-bottom: 100px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            padding-left: 0.5rem;
+        }
+
+        input, select {
+            appearance: none;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+            padding: 1rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            width: 100%;
+            text-align: center;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        button {
+            background: var(--accent);
+            color: var(--btn-text);
+            border: none;
+            padding: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0px var(--shadow-color);
+            margin-top: 0.5rem;
+            min-height: 4rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0px var(--shadow-color) !important;
+            filter: brightness(1.1);
+        }
+
+        /* ===== INFO ICONS + POPUP ===== */
+
+        .info {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.1rem;
+            height: 1.1rem;
+            margin-left: 0.4rem;
+            border-radius: 50%;
+            border: 1px solid currentColor;
+            font-size: 0.65rem;
+            font-weight: bold;
+            letter-spacing: 0;
+            line-height: 1;
+            cursor: help;
+            vertical-align: middle;
+            opacity: 0.8;
+            user-select: none;
+        }
+
+        .info:hover, .info.open, .info:focus-visible {
+            opacity: 1;
+            color: var(--accent);
+            outline: none;
+        }
+
+        .fineprint {
+            text-align: center;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+        }
+
+        #popup {
+            position: fixed;
+            z-index: 10;
+            width: min(320px, calc(100vw - 32px));
+            padding: 0.9rem 1rem;
+            background: var(--history-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            font-size: 0.85rem;
+            line-height: 1.45;
+            text-align: left;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+        }
+
+        #popup.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #popup h4 {
+            margin: 0 0 0.5rem;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--combo-color);
+        }
+
+        #popup p {
+            margin: 0 0 0.6rem;
+        }
+
+        #popup p:last-child {
+            margin-bottom: 0;
+        }
+
+        .shake {
+            animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="display-area">
+        <div id="meta"><span id="metaText"></span><span class="info" data-info="date" role="button" tabindex="0" aria-label="About the date">?</span></div>
+        <div id="prophecy">The stars are waiting.</div>
+        <div id="readout"><div id="readoutText"></div></div>
+    </div>
+
+    <div class="controls">
+        <div class="input-group">
+            <label for="nameInput">Your Name<span class="info" data-info="name" role="button" tabindex="0" aria-label="Why we need your name">?</span></label>
+            <input id="nameInput" type="text" maxlength="40" autocomplete="off" placeholder="Name">
+        </div>
+
+        <div class="input-group">
+            <label for="signSelect">Your Sign<span class="info" data-info="sign" role="button" tabindex="0" aria-label="Why we need your sign">?</span></label>
+            <!-- &#9800; etc. are HTML entities, so the source stays ASCII -->
+            <select id="signSelect">
+                <option value="Aries">&#9800; Aries</option>
+                <option value="Taurus">&#9801; Taurus</option>
+                <option value="Gemini">&#9802; Gemini</option>
+                <option value="Cancer">&#9803; Cancer</option>
+                <option value="Leo">&#9804; Leo</option>
+                <option value="Virgo">&#9805; Virgo</option>
+                <option value="Libra">&#9806; Libra</option>
+                <option value="Scorpio">&#9807; Scorpio</option>
+                <option value="Sagittarius">&#9808; Sagittarius</option>
+                <option value="Capricorn">&#9809; Capricorn</option>
+                <option value="Aquarius">&#9810; Aquarius</option>
+                <option value="Pisces">&#9811; Pisces</option>
+            </select>
+        </div>
+
+        <button id="readBtn">CONSULT!</button>
+
+        <div class="fineprint">Methodology<span class="info" data-info="method" role="button" tabindex="0" aria-label="Methodology">?</span></div>
+    </div>
+
+    <div id="popup" role="tooltip"></div>
+
+    <script src="data.js"></script>
+    <script>
+        // WEEKDAYS, MONTHS and VERBS come from data.js
+
+        // ===== SEEDED RNG =====
+
+        // cyrb128: string -> four 32-bit hashes
+        function cyrb128(str) {
+            let h1 = 1779033703, h2 = 3144134277, h3 = 1013904242, h4 = 2773480762;
+            for (let i = 0, k; i < str.length; i++) {
+                k = str.charCodeAt(i);
+                h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
+                h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
+                h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+                h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
+            }
+            h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
+            h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
+            h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
+            h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
+            h1 ^= (h2 ^ h3 ^ h4); h2 ^= h1; h3 ^= h1; h4 ^= h1;
+            return [h1 >>> 0, h2 >>> 0, h3 >>> 0, h4 >>> 0];
+        }
+
+        // sfc32: seeded PRNG, returns floats in [0, 1)
+        function sfc32(a, b, c, d) {
+            return function () {
+                a |= 0; b |= 0; c |= 0; d |= 0;
+                const t = (a + b | 0) + d | 0;
+                d = d + 1 | 0;
+                a = b ^ b >>> 9;
+                b = c + (c << 3) | 0;
+                c = (c << 21 | c >>> 11);
+                c = c + t | 0;
+                return (t >>> 0) / 4294967296;
+            };
+        }
+
+        function pick(rng, list) {
+            return list[Math.floor(rng() * list.length)];
+        }
+
+        function pickWeighted(rng, pairs) {
+            const total = pairs.reduce((sum, p) => sum + p[1], 0);
+            let r = rng() * total;
+            for (const [value, weight] of pairs) {
+                if (r < weight) return value;
+                r -= weight;
+            }
+            return pairs[pairs.length - 1][0];
+        }
+
+        // ===== GENERATOR =====
+
+        function todayIso() {
+            // local date, ISO 8601 (YYYY-MM-DD)
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        }
+
+        function pickTime(rng) {
+            const roll = rng();
+            if (roll < 0.80) return 'next ' + pickWeighted(rng, WEEKDAYS);
+            if (roll < 0.95) return 'next ' + pick(rng, MONTHS);
+            const years = 1 + Math.floor(rng() * 3);
+            return years === 1 ? 'in a year' : `in ${years} years`;
+        }
+
+        function generate(name, sign, date) {
+            const key = [name.trim().toLowerCase().normalize('NFC'), sign, date].join('|');
+            const rng = sfc32(...cyrb128(key));
+
+            const time = pickTime(rng);
+            const verb = pick(rng, Object.keys(VERBS));
+            const obj = pick(rng, VERBS[verb]);
+
+            const sentence = `${time}, you will ${verb} ${obj}.`;
+
+            // readout uses the same rng AFTER the prophecy picks,
+            // so existing prophecies stay unchanged
+            return {
+                text: sentence.charAt(0).toUpperCase() + sentence.slice(1),
+                readout: makeReadout(rng, time)
+            };
+        }
+
+        function makeReadout(rng, time) {
+            const fidelity = (90 + rng() * 9.9).toFixed(1);
+            const entanglement = (0.5 + rng() * 0.49).toFixed(2);
+
+            // uncertainty unit scales with how far the prophecy reaches
+            let unit = 'days';
+            if (/^in /.test(time)) unit = 'months';
+            else if (MONTHS.some((m) => time.endsWith(m))) unit = 'weeks';
+            const margin = 1 + Math.floor(rng() * 3);
+
+            // random 3D direction, normalised to unit length
+            let v = [rng() * 2 - 1, rng() * 2 - 1, rng() * 2 - 1];
+            const len = Math.hypot(...v) || 1;
+            v = v.map((x) => (x / len).toFixed(2));
+
+            return [
+                `Collapse fidelity: ${fidelity}%`,
+                `Entanglement index: ${entanglement}`,
+                `Heisenberg margin: +/- ${margin} ${margin === 1 ? unit.slice(0, -1) : unit}`,
+                `Destiny eigenvector: (${v.join(', ')})`
+            ];
+        }
+
+        // ===== UI =====
+
+        const readBtn = document.getElementById('readBtn');
+        const nameInput = document.getElementById('nameInput');
+        const signSelect = document.getElementById('signSelect');
+        const prophecy = document.getElementById('prophecy');
+        const meta = document.getElementById('meta');
+        const metaText = document.getElementById('metaText');
+        const readout = document.getElementById('readout');
+        const readoutText = document.getElementById('readoutText');
+
+        function consult() {
+            const name = nameInput.value.trim();
+            if (!name) {
+                nameInput.classList.remove('shake');
+                void nameInput.offsetWidth;
+                nameInput.classList.add('shake');
+                nameInput.focus();
+                return;
+            }
+
+            const sign = signSelect.value;
+            const date = todayIso();
+            const result = generate(name, sign, date);
+
+            prophecy.classList.remove('active', 'shake');
+            meta.classList.remove('visible');
+            readout.classList.remove('visible');
+            void prophecy.offsetWidth;
+            prophecy.classList.add('shake');
+
+            // short "scramble" with throwaway lines, like the dice roll
+            const junk = sfc32(...cyrb128(String(Date.now())));
+            const verbs = Object.keys(VERBS);
+            let counter = 0;
+            const interval = setInterval(() => {
+                const v = pick(junk, verbs);
+                prophecy.innerText = `You will ${v} ${pick(junk, VERBS[v])}...`;
+                counter++;
+                if (counter > 6) {
+                    clearInterval(interval);
+                    prophecy.innerText = result.text;
+                    prophecy.classList.add('active');
+                    readoutText.replaceChildren(...result.readout.map((line) => {
+                        const s = document.createElement('span');
+                        s.textContent = line;
+                        return s;
+                    }));
+                    readout.classList.add('visible');
+                    metaText.textContent = `${name} / ${sign} / ${date}`;
+                    meta.classList.add('visible');
+                    if (window.navigator.vibrate) window.navigator.vibrate(50);
+                }
+            }, 40);
+        }
+
+        // ===== INFO POPUPS =====
+        // Hover shows a popup (mouse only); click/tap pins it until
+        // the next click anywhere else, or Escape.
+
+        const popup = document.getElementById('popup');
+        const canHover = window.matchMedia('(hover: hover)').matches;
+        let pinned = null;
+
+        function showPopup(icon) {
+            const entry = INFO[icon.dataset.info];
+            if (!entry) return;
+
+            popup.replaceChildren();
+            const h = document.createElement('h4');
+            h.textContent = entry.title;
+            popup.appendChild(h);
+            for (const text of entry.paragraphs) {
+                const p = document.createElement('p');
+                p.textContent = text;
+                popup.appendChild(p);
+            }
+
+            // place above the icon, flip below if no room, clamp to viewport
+            const r = icon.getBoundingClientRect();
+            const w = popup.offsetWidth;
+            const hgt = popup.offsetHeight;
+            const gap = 8;
+            const margin = 16;
+            let top = r.top - hgt - gap;
+            if (top < margin) top = r.bottom + gap;
+            let left = r.left + r.width / 2 - w / 2;
+            left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+            popup.style.top = `${top}px`;
+            popup.style.left = `${left}px`;
+            popup.classList.add('visible');
+        }
+
+        function hidePopup() {
+            popup.classList.remove('visible');
+            if (pinned) pinned.classList.remove('open');
+            pinned = null;
+        }
+
+        document.querySelectorAll('.info').forEach((icon) => {
+            if (canHover) {
+                icon.addEventListener('mouseenter', () => { if (!pinned) showPopup(icon); });
+                icon.addEventListener('mouseleave', () => { if (!pinned) hidePopup(); });
+            }
+
+            const toggle = (e) => {
+                e.preventDefault();      // stop <label> from focusing its input
+                e.stopPropagation();     // stop the outside-click close
+                if (pinned === icon) { hidePopup(); return; }
+                hidePopup();
+                pinned = icon;
+                icon.classList.add('open');
+                showPopup(icon);
+            };
+            icon.addEventListener('click', toggle);
+            icon.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') toggle(e);
+            });
+        });
+
+        popup.addEventListener('click', (e) => e.stopPropagation());
+        document.addEventListener('click', hidePopup);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(); });
+        window.addEventListener('resize', hidePopup);
+
+        readBtn.addEventListener('click', consult);
+        nameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') consult();
+        });
+    </script>
+</body>
+</html>
