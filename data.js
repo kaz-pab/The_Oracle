@@ -588,7 +588,7 @@ const LANGS = {
             sign: {
                 title: 'Warunek brzegowy',
                 paragraphs: [
-                    "W chwili narodzin strumienie neutrin z cia\u0142 niebieskich odciskaj\u0105 stan pocz\u0105tkowy na kwantowej pianie niemowl\u0119cia.",
+                    "W chwili narodzin strumienie neutrin z cia\u0142 niebieskich odciskaj\u0105 stan pocz\u0105tkowy na matrycy \u015bwiadomości niemowl\u0119cia.",
                     "Nie mo\u017cemy go zmierzy\u0107 bezpo\u015brednio (szpital si\u0119 nie zgodzi\u0142), wi\u0119c przybli\u017camy go znakiem zodiaku, z dok\u0142adno\u015bci\u0105 do mniej wi\u0119cej jednej dwunastej po\u0142o\u017ce\u0144 S\u0142o\u0144ca, z poprawk\u0105 na precesj\u0119 i rotacj\u0119."
                 ]
             },
