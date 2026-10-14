@@ -279,6 +279,78 @@ const LANGS = {
                 'a GPS navigation system to a route-finding race',
                 'a vending machine to an arm wrestling match',
                 'a flock of seagulls to a sing-off'
+            ]],
+            ['be mistaken for', [
+                'a famous chess grandmaster',
+                'a missing member of a boy band',
+                'the new IT guy',
+                'a very convincing statue',
+                'a minor celebrity from a cooking show',
+                'the heir to a country nobody can find on a map',
+                'a spy, and the local seniors club will not let it go',
+                'the long-lost twin of the local weather presenter',
+                'a mannequin during a department store stocktake',
+                'the person who was supposed to bring the cake'
+            ]],
+            ['inherit', [
+                'a lighthouse nowhere near the sea',
+                'a feud with the neighbours dating back to 1987',
+                'a timeshare on the Moon',
+                'a suspiciously heavy suitcase that hums',
+                'exactly 4 metres of railway track',
+                'the title of Baron of a specific roundabout',
+                'your grandmother\'s collection of angry porcelain cats',
+                'a sock drawer with its own legal representation',
+                'a parrot that only knows your passwords',
+                'a vineyard that only produces vinegar'
+            ]],
+            ['hide from', [
+                'your dentist',
+                'a group chat with 47 unread messages',
+                'an extremely persistent telephone pollster',
+                'the consequences of your own playlist',
+                'a courier who knows you are home',
+                'your landlord, in a wardrobe',
+                'a heron with a personal grudge against you',
+                'a neighbour who wants to show you holiday photos',
+                'a parking warden with a photographic memory',
+                'a wedding invitation awaiting your reply since March'
+            ]],
+            ['dream about', [
+                'a giraffe doing your taxes',
+                'a supermarket with no exits',
+                'a sandwich that knows your secrets',
+                'a walrus reading you the news',
+                'an alphabet with one extra letter',
+                'an exam nobody signed you up for',
+                'a staircase that only goes sideways',
+                'a job interview conducted entirely by otters',
+                'your old maths teacher, who became a DJ',
+                'a version of you that answers emails on time'
+            ]],
+            ['sell', [
+                'a used bicycle to a confused tourist',
+                'a bridge that does not belong to you',
+                'lemonade to a lemon farmer',
+                'a painting made by your cat',
+                'a startup idea written on a napkin',
+                'your old phone with all the photos still on it',
+                'a mirror that shows next week',
+                'an autograph to someone who thinks you are someone else',
+                'the rights to your life story to a regional radio station',
+                'one perfectly ordinary rock for 400 euros'
+            ]],
+            ['buy', [
+                'a castle in instalments',
+                '40 kilograms of bubble wrap',
+                'a goat you did not plan for',
+                'a map to treasure buried under the supermarket',
+                'a bridge from a very friendly stranger',
+                'a houseplant that was already dead in the shop',
+                'a lifetime subscription to a magazine about fences',
+                'a second-hand submarine with minor leaks',
+                'a lottery ticket whose prize is another lottery ticket',
+                'a bicycle that turns out to be your old bicycle'
             ]]
         ],
 
@@ -301,7 +373,7 @@ const LANGS = {
             date: {
                 title: 'Temporal Decoherence',
                 paragraphs: [
-                    "Prophetic coherence decays with a half-life of 86 000 (-/+500) seconds. After that, environmental entropy (traffic, small talk, email) renders the signal unusable and a fresh reading is required.",
+                    "Prophetic coherence decays with a half-life of 86 397 (-/+500) seconds. After that, environmental entropy (traffic, small talk, email) renders the signal unusable and a fresh reading is required.",
                     "This is why your horoscope changes daily, and why reading yesterday's is not only useless but mildly hazardous."
                 ]
             },
@@ -574,6 +646,78 @@ const LANGS = {
                 'nawigacj\u0119 GPS na wy\u015bcig w wyznaczaniu trasy',
                 'automat z przek\u0105skami na si\u0142owanie si\u0119 na r\u0119k\u0119',
                 'stado mew na pojedynek wokalny'
+            ]],
+            ['wezm\u0105 ci\u0119 za', [
+                's\u0142ynnego arcymistrza szachowego',
+                'zaginionego cz\u0142onka boysbandu',
+                'nowego informatyka',
+                'bardzo przekonuj\u0105cy pomnik',
+                'pomniejsz\u0105 gwiazd\u0119 programu kulinarnego',
+                'nast\u0119pc\u0119 tronu kraju, kt\u00f3rego nikt nie potrafi znale\u017a\u0107 na mapie',
+                'szpiega, a klub seniora nie odpu\u015bci',
+                'dawno zaginionego bli\u017aniaka lokalnego prezentera pogody',
+                'manekina podczas inwentaryzacji w domu towarowym',
+                'osob\u0119, kt\u00f3ra mia\u0142a przynie\u015b\u0107 tort'
+            ]],
+            ['odziedziczysz', [
+                'latarni\u0119 morsk\u0105 z dala od jakiegokolwiek morza',
+                'zatarg z s\u0105siadami z 1987 roku',
+                'udzia\u0142 w apartamencie na Ksi\u0119\u017cycu',
+                'podejrzanie ci\u0119\u017ck\u0105 walizk\u0119, kt\u00f3ra nuci',
+                'dok\u0142adnie 4 metry tor\u00f3w kolejowych',
+                'tytu\u0142 barona pewnego ronda',
+                'babcin\u0105 kolekcj\u0119 rozgniewanych porcelanowych kot\u00f3w',
+                'szuflad\u0119 na skarpetki z w\u0142asnym pe\u0142nomocnikiem prawnym',
+                'papug\u0119, kt\u00f3ra zna wy\u0142\u0105cznie twoje has\u0142a',
+                'winnic\u0119, z kt\u00f3rej wychodzi wy\u0142\u0105cznie ocet'
+            ]],
+            ['b\u0119dziesz si\u0119 ukrywa\u0107 przed', [
+                'swoim dentyst\u0105',
+                'czatem grupowym z 47 nieprzeczytanymi wiadomo\u015bciami',
+                'wyj\u0105tkowo upartym ankieterem telefonicznym',
+                'konsekwencjami w\u0142asnej playlisty',
+                'kurierem, kt\u00f3ry wie, \u017ce jeste\u015b w domu',
+                'w\u0142a\u015bcicielem mieszkania, w szafie',
+                'czapl\u0105, kt\u00f3ra ma z tob\u0105 osobiste porachunki',
+                's\u0105siadem, kt\u00f3ry chce ci pokaza\u0107 zdj\u0119cia z wakacji',
+                'kontrolerem parkingowym z pami\u0119ci\u0105 fotograficzn\u0105',
+                'zaproszeniem na \u015blub, kt\u00f3re od marca czeka na odpowied\u017a'
+            ]],
+            ['przy\u015bni ci si\u0119', [
+                '\u017cyrafa, kt\u00f3ra rozlicza twoje podatki',
+                'supermarket bez wyj\u015b\u0107',
+                'kanapka, kt\u00f3ra zna twoje sekrety',
+                'mors, kt\u00f3ry czyta ci wiadomo\u015bci',
+                'alfabet z jedn\u0105 dodatkow\u0105 liter\u0105',
+                'egzamin, na kt\u00f3ry nikt ci\u0119 nie zapisywa\u0142',
+                'klatka schodowa, kt\u00f3ra prowadzi wy\u0142\u0105cznie w bok',
+                'rozmowa o prac\u0119 prowadzona w ca\u0142o\u015bci przez wydry',
+                'tw\u00f3j dawny nauczyciel matematyki, kt\u00f3ry zosta\u0142 DJ-em',
+                'wersja ciebie, kt\u00f3ra odpisuje na maile na czas'
+            ]],
+            ['sprzedasz', [
+                'u\u017cywany rower zdezorientowanemu tury\u015bcie',
+                'most, kt\u00f3ry nie nale\u017cy do ciebie',
+                'lemoniad\u0119 plantatorowi cytryn',
+                'obraz namalowany przez twojego kota',
+                'pomys\u0142 na startup zapisany na serwetce',
+                'stary telefon ze wszystkimi zdj\u0119ciami w \u015brodku',
+                'lustro, kt\u00f3re pokazuje przysz\u0142y tydzie\u0144',
+                'autograf komu\u015b, kto wzi\u0105\u0142 ci\u0119 za kogo\u015b innego',
+                'prawa do historii swojego \u017cycia regionalnej rozg\u0142o\u015bni radiowej',
+                'jeden, zupe\u0142nie zwyczajny kamie\u0144 za 400 euro'
+            ]],
+            ['kupisz', [
+                'zamek na raty',
+                '40 kilogram\u00f3w folii b\u0105belkowej',
+                'koz\u0119, kt\u00f3rej nie by\u0142o w planach',
+                'map\u0119 do skarbu zakopanego pod supermarketem',
+                'most od bardzo sympatycznego nieznajomego',
+                'ro\u015blin\u0119 doniczkow\u0105, kt\u00f3ra by\u0142a martwa ju\u017c w sklepie',
+                'do\u017cywotni\u0105 prenumerat\u0119 magazynu o p\u0142otach',
+                'u\u017cywan\u0105 \u0142\u00f3d\u017a podwodn\u0105 z drobnymi przeciekami',
+                'los na loteri\u0119, na kt\u00f3rym wygrywa si\u0119 kolejny los',
+                'rower, kt\u00f3ry okazuje si\u0119 twoim starym rowerem'
             ]]
         ],
 
@@ -595,7 +739,7 @@ const LANGS = {
             date: {
                 title: 'Dekoherencja czasowa',
                 paragraphs: [
-                    "Sp\u00f3jno\u015b\u0107 proroctwa zanika z okresem p\u00f3\u0142trwania 86 000 (-/+500) sekund. Po tym czasie entropia otoczenia (korki, pogaw\u0119dki, e-maile) czyni sygna\u0142 bezu\u017cytecznym i potrzebny jest nowy odczyt.",
+                    "Sp\u00f3jno\u015b\u0107 proroctwa zanika z okresem p\u00f3\u0142trwania 86 397 (-/+500) sekund. Po tym czasie entropia otoczenia (korki, pogaw\u0119dki, e-maile) czyni sygna\u0142 bezu\u017cytecznym i potrzebny jest nowy odczyt.",
                     "Dlatego tw\u00f3j horoskop zmienia si\u0119 codziennie, a czytanie wczorajszego jest nie tylko bezu\u017cyteczne, ale i lekko niebezpieczne."
                 ]
             },
