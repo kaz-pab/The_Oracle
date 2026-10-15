@@ -494,17 +494,27 @@
             return { time, verb, obj, readout: makeReadout(rng) };
         }
 
+        // Greek lowercase alpha..omega (U+03B1..U+03C9), without
+        // final sigma (U+03C2) and omicron (U+03BF, looks like "o")
+        const GREEK = Array.from({ length: 25 }, (_, i) => String.fromCodePoint(0x3b1 + i))
+            .filter((c) => c !== '\u03c2' && c !== '\u03bf');
+
         function makeReadout(rng) {
             const fidelity = (90 + rng() * 9.9).toFixed(1);
             const entanglement = (0.5 + rng() * 0.49).toFixed(2);
             const margin = 1 + Math.floor(rng() * 3);
 
-            // random 3D direction, normalised to unit length
-            let v = [rng() * 2 - 1, rng() * 2 - 1, rng() * 2 - 1];
+            // first component as before: random 3D direction, normalised
+            const v = [rng() * 2 - 1, rng() * 2 - 1, rng() * 2 - 1];
             const len = Math.hypot(...v) || 1;
-            v = v.map((x) => (x / len).toFixed(2));
+            const first = (v[0] / len).toFixed(2);
 
-            return { fidelity, entanglement, margin, vector: v };
+            // esoteric part: Greek letter, sign, angle 0..180 degrees
+            const greek = pick(rng, GREEK);
+            const sign = rng() < 0.5 ? '+' : '-';
+            const degrees = pickIndex(rng, 181);
+
+            return { fidelity, entanglement, margin, vector: { first, greek, sign, degrees } };
         }
 
         function describe(reading, T) {
@@ -526,7 +536,10 @@
                     fill(T.readout.fidelity, { value: num(r.fidelity) }),
                     fill(T.readout.entanglement, { value: num(r.entanglement) }),
                     fill(T.readout.margin, { value: r.margin, unit: T.units[unit][r.margin === 1 ? 0 : 1] }),
-                    fill(T.readout.vector, { value: r.vector.map(num).join(T.listSep) })
+                    fill(T.readout.vector, {
+                        value: num(r.vector.first) + T.listSep
+                            + r.vector.greek + r.vector.sign + r.vector.degrees + '\u00b0'   // degree sign
+                    })
                 ]
             };
         }
